@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-demo-deploy
+  labels:
+    app: springboot-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-demo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: springboot-demo
+    spec:
+      containers:
+      - name: springboot-demo-container
+        image: dg185245/springboot-demo:docker-test
+        env:
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-username
+        - name: MYSQL_PASSWORD
+          value: password
+        #- name: MYSQL_PASSWORD
+        #  valueFrom:
+        #    secretKeyRef:
+        #      name: mysql-secret
+        #      key: mysql-root-password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: mysql-database
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: mysql-host          
+        #- name: MYSQL_PORT
+        #  value: 3306
+
+        ports:
+        - containerPort: 8080
+          name: http-port

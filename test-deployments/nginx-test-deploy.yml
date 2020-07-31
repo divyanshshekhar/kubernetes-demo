@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy
+  labels:
+    test: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      test: nginx
+  template:
+    metadata:
+      labels:
+        test: nginx
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        volumeMounts:
+        - name: nginx-persistent-storage
+          mountPath: /var/lib/nginx
+      volumes:
+        - name: nginx-persistent-storage
+          persistentVolumeClaim:
+            claimName: volume-claim-25mib
